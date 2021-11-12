@@ -4,11 +4,17 @@ Resources:
   LoggingBucket:
     Type: "AWS::S3::Bucket"
     Properties:
-      AccessControl: "LogDeliveryWrite"
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: "AES256"
+      LifecycleConfiguration:
+        Rules:
+          - ExpirationInDays: 180
+            Status: Enabled
+            Transitions:
+              - StorageClass: GLACIER
+                TransitionInDays: 90
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         BlockPublicPolicy: true
@@ -49,6 +55,8 @@ Resources:
           Value: production
         - Key: billing
           Value: mailejoe
+      VersioningConfiguration:
+        Status: Enabled
 Outputs:
   TemplateID:
     Description: "ID of the operations/buckets template"
