@@ -88,3 +88,6 @@ jobs:
           no_output_timeout: 30m
           command: |
             echo "upload code"
+            cd lambda
+            npm install --production
+            zip discord.zip discord.js package.json ./node_modules
