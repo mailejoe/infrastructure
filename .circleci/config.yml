@@ -82,7 +82,7 @@ jobs:
       - run:
           name: deploy buckets
           no_output_timeout: 30m
-          command: aws cloudformation deploy --template-file buckets.yml --stack-name mailejoe-buckets --tags application=mailejoe
+          command: aws cloudformation deploy --template-file buckets.yml --stack-name mailejoe-buckets --no-fail-on-empty-changeset --tags application=mailejoe
       - run:
           name: upload code
           no_output_timeout: 30m
