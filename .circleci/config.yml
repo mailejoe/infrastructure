@@ -73,7 +73,7 @@ jobs:
           no_output_timeout: 30m
           command: |
             apt update
-            apt install -y tzdata
+            DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends tzdata
             apt install -y software-properties-common
             apt install -y awscli
             apt install -y curl zip jq
