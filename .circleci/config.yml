@@ -1,0 +1,82 @@
+version: 2.1
+
+orbs:
+  aws-s3: circleci/aws-s3@1.0.15
+
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - lint:
+          filters:
+            branches:
+              ignore: /noop-.*/
+      - validate:
+          filters:
+            branches:
+              ignore: /noop-.*/
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
+
+jobs:
+  lint:
+    docker:
+      - image: python:3.9
+
+    working_directory: ~/mailejoe
+
+    steps:
+      - checkout
+      - run:
+          name: install dependencies
+          no_output_timeout: 30m
+          command:
+            - pip install cfn-lint
+            - cfn-lint ~/mailejoe/**/*.yml
+
+  validate:
+    docker:
+      - image: amazon/aws-cli
+        environment:
+          AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+          AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+          AWS_DEFAULT_REGION: us-east-1
+
+    working_directory: ~/mailejoe
+
+    steps:
+      - checkout
+      - run:
+          name: validate
+          no_output_timeout: 30m
+          command: aws cloudformation validate-template --template-body file://mailejoe.yml
+
+  deploy:
+    docker:
+      - image: 005030621348.dkr.ecr.us-east-1.amazonaws.com/mailejoe/mailejoe-api-ci:1.0.0
+        aws_auth:
+          aws_access_key_id: $AWS_ACCESS_KEY_ID
+          aws_secret_access_key: $AWS_SECRET_ACCESS_KEY
+
+    working_directory: ~/mailejoe
+
+    steps:
+      - checkout
+      - run: npm install
+      - run:
+          name: Deploy the migrations
+          no_output_timeout: 30m
+          command: |
+            cd ~/mailejoe/lambda
+            echo "Intalling Migration Dependencies"
+            npm install --production
+            echo "Zip Code"
+            zip migrate.zip migrate.js ../migrations ../src/entities ./node_modules
+            echo "Copy Code to S3"
+            aws s3 cp ./migrate.zip s3://mailejoe-builds
+            echo "Running migrations"
+            aws lambda invoke --function mailejoe-migrate response-migrate.json

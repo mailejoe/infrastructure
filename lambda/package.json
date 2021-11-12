@@ -1,0 +1,11 @@
+{
+  "name": "lambda-discord",
+  "version": "0.0.1",
+  "description": "Handles processing SNS alerts and posting to Discord",
+  "author": "Marc Fisher",
+  "license": "MIT",
+  "dependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.39.0",
+    "axios": "^0.24.0"
+  }
+}
