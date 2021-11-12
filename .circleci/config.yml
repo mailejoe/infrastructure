@@ -73,6 +73,8 @@ jobs:
           no_output_timeout: 30m
           command: |
             apt update
+            apt install -y tzdata
+            apt install -y software-properties-common
             apt install -y awscli
             apt install -y curl zip jq
             curl -fsSL https://deb.nodesource.com/setup_14.x | bash -
