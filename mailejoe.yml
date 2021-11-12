@@ -8,4 +8,5 @@ Resources:
     Properties:
       TemplateURL: alerts.yml
       Parameters:
-        Email: marc.fisher@mailejoe.com
+        Email: $MAILEJOE_SUPPORT_EMAIL
+        CodeRepoBucket: $MAILEJOE_CODE_REPO_BUCKET

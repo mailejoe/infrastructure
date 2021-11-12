@@ -15,6 +15,13 @@ workflows:
           filters:
             branches:
               ignore: /noop-.*/
+      - deploy:
+          requires:
+            - lint
+            - validate
+          filters:
+            branches:
+              only: master
 
 jobs:
   lint:
@@ -48,3 +55,34 @@ jobs:
           name: validate
           no_output_timeout: 30m
           command: aws cloudformation validate-template --template-body file://mailejoe.yml
+
+  deploy:
+    docker:
+      - image: ubuntu
+        environment:
+          AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+          AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+          AWS_DEFAULT_REGION: us-east-1
+
+    working_directory: ~/mailejoe
+
+    steps:
+      - checkout
+      - run:
+          name: install dependencies
+          no_output_timeout: 30m
+          command: |
+            apt update
+            apt install -y awscli
+            apt install -y curl zip jq
+            curl -fsSL https://deb.nodesource.com/setup_14.x | bash -
+            apt install -y nodejs
+      - run:
+          name: deploy buckets
+          no_output_timeout: 30m
+          command: aws cloudformation deploy --template-file buckets.yml --stack-name mailejoe-buckets --tags application=mailejoe
+      - run:
+          name: upload code
+          no_output_timeout: 30m
+          command: |
+            echo "upload code"

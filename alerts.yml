@@ -7,9 +7,16 @@ Metadata:
           default: "Alert Parameters"
         Parameters:
           - Email
+      - Label:
+          default: "Storage Parameters"
+        Parameters:
+          - CodeRepoBucket
 Parameters:
   Email:
     Description: "Email address that will receive alerts."
+    Type: String
+  CodeRepoBucket:
+    Description: "Bucket that is used to store versioned code."
     Type: String
 Resources:
   LoggingBucket:

@@ -1,0 +1,67 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Operations: creates the logging and code assets bucket"
+LoggingBucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      AccessControl: "LogDeliveryWrite"
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: "AES256"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: application
+          Value: mailejoe
+        - Key: environment
+          Value: production
+        - Key: purpose
+          Value: audit
+        - Key: billing
+          Value: mailejoe
+  CodeAssetsBucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      AccessControl: "Private"
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: "AES256"
+      LoggingConfiguration:
+        DestinationBucketName: !Ref "LoggingBucket"
+        LogFilePrefix: "code-assets"
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: "BucketOwnerPreferred"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: application
+          Value: mailejoe
+        - Key: environment
+          Value: production
+        - Key: billing
+          Value: mailejoe
+Outputs:
+  TemplateID:
+    Description: "ID of the operations/buckets template"
+    Value: "operations/buckets"
+  StackName:
+    Description: "Stack Name"
+    Value: !Sub "${AWS::StackName}"
+  LoggingBucketName:
+    Description: "The name of the logging bucket"
+    Value: !Ref LoggingBucket
+    Export:
+      Name: !Sub "${AWS::StackName}-LoggingBucketName"
+  CodeAssetsBucketName:
+    Description: "The name of the code assets bucket"
+    Value: !Ref CodeAssetsBucket
+    Export:
+      Name: !Sub "${AWS::StackName}-CodeAssetsBucketName"
