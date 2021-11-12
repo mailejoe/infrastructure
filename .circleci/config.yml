@@ -15,12 +15,6 @@ workflows:
           filters:
             branches:
               ignore: /noop-.*/
-      - deploy:
-          requires:
-            - build
-          filters:
-            branches:
-              only: master
 
 jobs:
   lint:
@@ -54,29 +48,3 @@ jobs:
           name: validate
           no_output_timeout: 30m
           command: aws cloudformation validate-template --template-body file://mailejoe.yml
-
-  deploy:
-    docker:
-      - image: 005030621348.dkr.ecr.us-east-1.amazonaws.com/mailejoe/mailejoe-api-ci:1.0.0
-        aws_auth:
-          aws_access_key_id: $AWS_ACCESS_KEY_ID
-          aws_secret_access_key: $AWS_SECRET_ACCESS_KEY
-
-    working_directory: ~/mailejoe
-
-    steps:
-      - checkout
-      - run: npm install
-      - run:
-          name: Deploy the migrations
-          no_output_timeout: 30m
-          command: |
-            cd ~/mailejoe/lambda
-            echo "Intalling Migration Dependencies"
-            npm install --production
-            echo "Zip Code"
-            zip migrate.zip migrate.js ../migrations ../src/entities ./node_modules
-            echo "Copy Code to S3"
-            aws s3 cp ./migrate.zip s3://mailejoe-builds
-            echo "Running migrations"
-            aws lambda invoke --function mailejoe-migrate response-migrate.json
