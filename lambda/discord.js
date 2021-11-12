@@ -70,7 +70,5 @@ module.exports.handler = async function handler(event) {
     }
   });
 
-  //https://discord.com/api/webhooks/904759385291620352/ebieJ6j0prydboriKE7Kph43PxmS7TXWOn4u8llrcSzsApbwLTx-u2N1Aadb0BjB-jrd
-
   return 'SNS -> Discord completed successfully';
 };
