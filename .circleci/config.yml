@@ -85,12 +85,13 @@ jobs:
           command: |
             aws cloudformation deploy --template-file buckets.yml --stack-name mailejoe-buckets --no-fail-on-empty-changeset --tags application=mailejoe
       - run:
-          name: upload code
+          name: discord code
           no_output_timeout: 30m
           command: |
-            echo "upload code"
+            echo "build discord code"
             cd lambda
             npm install --production
             zip discord.zip discord.js package.json ./node_modules
+            echo "upload discord code"
             CODE_BUCKET=$(aws cloudformation describe-stacks --stack-name mailejoe-buckets | jq -c '.Stacks[0].Outputs[] | select(.OutputKey=="CodeAssetsBucketName") | .OutputValue')
             aws s3 cp discord.zip s3://$CODE_BUCKET/dev-ops/discord.zip
