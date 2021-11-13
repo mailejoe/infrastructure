@@ -54,7 +54,10 @@ jobs:
       - run:
           name: validate
           no_output_timeout: 30m
-          command: aws cloudformation validate-template --template-body file://mailejoe.yml
+          command: |
+            aws cloudformation validate-template --template-body file://buckets.yml
+            aws cloudformation validate-template --template-body file://alerts.yml
+            aws cloudformation validate-template --template-body file://vpc.yml
 
   deploy:
     docker:
