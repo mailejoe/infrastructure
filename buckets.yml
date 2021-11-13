@@ -74,7 +74,7 @@ Outputs:
       Name: !Sub "${AWS::StackName}-LoggingBucketName"
   LoggingBucketArn:
     Description: "The ARN of the logging bucket"
-    Value: !Ref LoggingBucket.Arn
+    Value: !GetAtt LoggingBucket.Arn
     Export:
       Name: !Sub "${AWS::StackName}-LoggingBucketArn"
   CodeAssetsBucketName:
