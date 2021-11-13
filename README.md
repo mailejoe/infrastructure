@@ -8,3 +8,9 @@ creating a new VPC for it to run in.
 - Alerts pushed to Discord with a fallback email option
 - New 3AZ VPC setup for the ECS cluster to run in
 - Best practice security setup including flowlogs, logging, cloudwatch alerts, and more.
+
+## Architecture
+
+## Deployment
+
+### Environment Variables
