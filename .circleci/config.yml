@@ -100,4 +100,5 @@ jobs:
           name: deploy mailejoe infrastructure
           no_output_timeout: 30m
           command: |
-            aws cloudformation deploy --template-file alerts.yml --stack-name mailejoe-alerts --parameter-overrides Email=$MAILEJOE_SUPPORT_EMAIL --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset --tags application=mailejoe
+            VERSION=$(cat lambda/package.json | jq -r '.version')
+            aws cloudformation deploy --template-file alerts.yml --stack-name mailejoe-alerts --parameter-overrides Email=$MAILEJOE_SUPPORT_EMAIL LambdaVersion=$VERSION --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset --tags application=mailejoe

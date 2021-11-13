@@ -7,9 +7,13 @@ Metadata:
           default: "Alert Parameters"
         Parameters:
           - Email
+          - LambdaVersion
 Parameters:
   Email:
     Description: "Email address that will receive alerts."
+    Type: String
+  LambdaVersion:
+    Description: "Version of the existing Lambda code."
     Type: String
 Resources:
   LambdaRole:
@@ -58,12 +62,12 @@ Resources:
     Properties:
       Code:
         S3Bucket: !ImportValue "mailejoe-buckets-CodeAssetsBucketName"
-        S3Key: "dev-ops/discord.zip"
+        S3Key: !Sub "dev-ops/discord-$VERSION.zip"
       Description: "Posts notifications to Discord."
       Handler: discord.handler
       MemorySize: 128
       PackageType: Zip
-      Role: !Ref "LambdaRole"
+      Role: !GetAtt LambdaRole.Arn
       Runtime: nodejs14.x
       Tags:
         - Key: application
