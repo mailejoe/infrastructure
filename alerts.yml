@@ -62,7 +62,7 @@ Resources:
     Properties:
       Code:
         S3Bucket: !ImportValue "mailejoe-buckets-CodeAssetsBucketName"
-        S3Key: !Sub "dev-ops/discord-$LambdaVersion.zip"
+        S3Key: !Sub "dev-ops/discord-${LambdaVersion}.zip"
       Description: "Posts notifications to Discord."
       Handler: discord.handler
       MemorySize: 128
