@@ -37,7 +37,7 @@ Resources:
             Resource: !Join
               - ""
               - - !ImportValue "mailejoe-buckets-LoggingBucketArn"
-                - "/${LogFilePrefix}/AWSLogs/${AWS::AccountId}/*"
+                - !Sub "/${LogFilePrefix}/AWSLogs/${AWS::AccountId}/*"
             Condition:
               StringEquals:
                 "s3:x-amz-acl": "bucket-owner-full-control"
@@ -54,7 +54,7 @@ Resources:
       LogDestination: !Join
         - ""
         - - !ImportValue "mailejoe-buckets-LoggingBucketArn"
-          - "/${LogFilePrefix}/"
+          - !Sub "/${LogFilePrefix}/"
       LogDestinationType: s3
       ResourceId: !ImportValue "mailejoe-vpc-VPC"
       ResourceType: "VPC"
