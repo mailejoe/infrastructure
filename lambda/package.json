@@ -1,6 +1,6 @@
 {
   "name": "lambda-discord",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Handles processing SNS alerts and posting to Discord",
   "author": "Marc Fisher",
   "license": "MIT",

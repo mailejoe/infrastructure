@@ -55,8 +55,6 @@ Resources:
           Value: production
         - Key: billing
           Value: mailejoe
-      VersioningConfiguration:
-        Status: Enabled
 Outputs:
   TemplateID:
     Description: "ID of the operations/buckets template"

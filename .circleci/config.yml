@@ -94,4 +94,5 @@ jobs:
             zip discord.zip discord.js package.json ./node_modules
             echo "upload discord code"
             CODE_BUCKET=$(aws cloudformation describe-stacks --stack-name mailejoe-buckets | jq -r '.Stacks[0].Outputs[] | select(.OutputKey=="CodeAssetsBucketName") | .OutputValue')
-            aws s3 cp discord.zip s3://$CODE_BUCKET/dev-ops/discord.zip
+            VERSION=$(cat package.json | jq -r '.version')
+            aws s3 cp discord.zip s3://$CODE_BUCKET/dev-ops/discord-$VERSION.zip
