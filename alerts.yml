@@ -79,6 +79,7 @@ Resources:
     Properties:
       FunctionName: !Ref DiscordLambda
       FunctionVersion: "$LATEST"
+      Name: DiscordLambdaAlias
   AlertsTopic:
     Type: "AWS::SNS::Topic"
     Properties:
