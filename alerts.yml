@@ -15,8 +15,7 @@ Resources:
   LambdaRole:
     Type: "AWS::IAM::Role"
     Properties:
-      RoleName: "DiscordNotificationsLambdaRole"
-      Path: "/"
+      Path: "/lambda/"
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
