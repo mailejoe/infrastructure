@@ -4,18 +4,11 @@ Metadata:
   "AWS::CloudFormation::Interface":
     ParameterGroups:
       - Label:
-          default: "Parent Stacks"
-        Parameters:
-          - ParentVPCStack
-      - Label:
           default: "Flow Logs Parameters"
         Parameters:
           - LogFilePrefix
           - TrafficType
 Parameters:
-  ParentVPCStack:
-    Description: "Stack name of parent VPC stack based on vpc/vpc-*azs.yaml template."
-    Type: String
   LogFilePrefix:
     Description: "Optional The log file prefix."
     Type: String
@@ -28,53 +21,23 @@ Parameters:
       - ACCEPT
       - REJECT
       - ALL
-Conditions:
-  HasLogFilePrefix: !Not [!Equals [!Ref LogFilePrefix, ""]]
 Resources:
-  LogBucket:
-    Type: "AWS::S3::Bucket"
-    Properties:
-      BucketEncryption:
-        ServerSideEncryptionConfiguration:
-          - ServerSideEncryptionByDefault:
-              SSEAlgorithm: "AES256"
-      PublicAccessBlockConfiguration:
-        BlockPublicAcls: true
-        BlockPublicPolicy: true
-        IgnorePublicAcls: true
-        RestrictPublicBuckets: true
-      VersioningConfiguration:
-        Status: "Enabled"
-      LifecycleConfiguration:
-        Rules:
-          - AbortIncompleteMultipartUpload:
-              DaysAfterInitiation: 7
-            Status: Enabled
-            Transitions:
-              - StorageClass: "ONEZONE_IA"
-                TransitionInDays: 30
-              - StorageClass: "GLACIER"
-                TransitionInDays: 60
-            NoncurrentVersionExpirationInDays: 90
-            ExpirationInDays: 90
   LogBucketPolicy:
     Type: "AWS::S3::BucketPolicy"
     Properties:
-      Bucket: !Ref LogBucket
+      Bucket: !ImportValue "mailejoe-buckets-LoggingBucketName"
       PolicyDocument:
         Version: "2012-10-17"
-        Statement: # https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs-s3.html#flow-logs-s3-permissions
+        Statement:
           - Sid: AWSLogDeliveryWrite
             Effect: Allow
             Principal:
               Service: "delivery.logs.amazonaws.com"
             Action: "s3:PutObject"
-            Resource:
-              !If [
-                HasLogFilePrefix,
-                !Sub "${LogBucket.Arn}/${LogFilePrefix}/AWSLogs/${AWS::AccountId}/*",
-                !Sub "${LogBucket.Arn}/AWSLogs/${AWS::AccountId}/*",
-              ]
+            Resource: !Join
+              - ""
+              - - !ImportValue "mailejoe-buckets-LoggingBucketArn"
+                - "/${LogFilePrefix}/AWSLogs/${AWS::AccountId}/*"
             Condition:
               StringEquals:
                 "s3:x-amz-acl": "bucket-owner-full-control"
@@ -83,19 +46,17 @@ Resources:
             Principal:
               Service: "delivery.logs.amazonaws.com"
             Action: "s3:GetBucketAcl"
-            Resource: !GetAtt "LogBucket.Arn"
+            Resource: !ImportValue "mailejoe-buckets-LoggingBucketArn"
   FlowLogInternalBucket:
     DependsOn: LogBucketPolicy
     Type: "AWS::EC2::FlowLog"
     Properties:
-      LogDestination:
-        !If [
-          HasLogFilePrefix,
-          !Sub "${LogBucket.Arn}/${LogFilePrefix}/",
-          !GetAtt "LogBucket.Arn",
-        ]
+      LogDestination: !Join
+        - ""
+        - - !ImportValue "mailejoe-buckets-LoggingBucketArn"
+          - "/${LogFilePrefix}/"
       LogDestinationType: s3
-      ResourceId: { "Fn::ImportValue": !Sub "${ParentVPCStack}-VPC" }
+      ResourceId: !ImportValue "mailejoe-vpc-VPC"
       ResourceType: "VPC"
       TrafficType: !Ref TrafficType
 Outputs:
@@ -105,8 +66,3 @@ Outputs:
   StackName:
     Description: "Stack Name"
     Value: !Sub "${AWS::StackName}"
-  LogBucketName:
-    Description: "Log Bucket Name"
-    Value: !Ref LogBucket
-    Export:
-      Name: !Sub "${AWS::StackName}-LogBucket"

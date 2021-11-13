@@ -10,11 +10,16 @@ Resources:
               SSEAlgorithm: "AES256"
       LifecycleConfiguration:
         Rules:
-          - ExpirationInDays: 180
+          - AbortIncompleteMultipartUpload:
+              DaysAfterInitiation: 7
+            ExpirationInDays: 90
+            NoncurrentVersionExpirationInDays: 90
             Status: Enabled
             Transitions:
-              - StorageClass: GLACIER
-                TransitionInDays: 90
+              - StorageClass: "ONEZONE_IA"
+                TransitionInDays: 30
+              - StorageClass: "GLACIER"
+                TransitionInDays: 60
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         BlockPublicPolicy: true
@@ -67,6 +72,11 @@ Outputs:
     Value: !Ref LoggingBucket
     Export:
       Name: !Sub "${AWS::StackName}-LoggingBucketName"
+  LoggingBucketArn:
+    Description: "The ARN of the logging bucket"
+    Value: !Ref LoggingBucket.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-LoggingBucketArn"
   CodeAssetsBucketName:
     Description: "The name of the code assets bucket"
     Value: !Ref CodeAssetsBucket
