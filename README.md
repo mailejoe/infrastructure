@@ -13,7 +13,7 @@ creating a new VPC for it to run in.
 
 #### Alarms
 
-![Alarms Architecture](assets/images/alarms.png)
+![Alarms Architecture](assets/images/Alarms.png)
 
 ## Deployment
 
