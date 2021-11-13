@@ -96,3 +96,8 @@ jobs:
             CODE_BUCKET=$(aws cloudformation describe-stacks --stack-name mailejoe-buckets | jq -r '.Stacks[0].Outputs[] | select(.OutputKey=="CodeAssetsBucketName") | .OutputValue')
             VERSION=$(cat package.json | jq -r '.version')
             aws s3 cp discord.zip s3://$CODE_BUCKET/dev-ops/discord-$VERSION.zip
+      - run:
+          name: deploy mailejoe infrastructure
+          no_output_timeout: 30m
+          command: |
+            aws cloudformation deploy --template-file mailejoe.yml --stack-name mailejoe --no-fail-on-empty-changeset --tags application=mailejoe
