@@ -1,5 +1,7 @@
 # Mailejoe Infrastructure
 
+[![mailejoe](https://circleci.com/gh/mailejoe/infrastructure.svg?style=svg)](LINK)
+
 Provides the cloudformation templates for setting up Mailejoe from scratch including
 creating a new VPC for it to run in.
 
