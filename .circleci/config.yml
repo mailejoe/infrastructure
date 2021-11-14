@@ -109,4 +109,4 @@ jobs:
             aws cloudformation deploy --template-file alerts.yml --stack-name mailejoe-alerts --parameter-overrides Email=$MAILEJOE_SUPPORT_EMAIL LambdaVersion=$VERSION --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset --tags application=mailejoe
             aws cloudformation deploy --template-file vpc.yml --stack-name mailejoe-vpc --parameter-overrides ClassB=20 --no-fail-on-empty-changeset --tags application=mailejoe
             aws cloudformation deploy --template-file flowlogs.yml --stack-name mailejoe-flowlogs --no-fail-on-empty-changeset --tags application=mailejoe
-            aws cloudformation deploy --template-file website.yml --stack-name mailejoe-website --parameter-overrides Domain=app.mailejoe.com HostedZoneId=$HOSTED_ZONE_ID ExistingCertificate=$ACM_CERT_ARN --no-fail-on-empty-changeset --tags application=mailejoe
+            aws cloudformation deploy --template-file website.yml --stack-name mailejoe-website --parameter-overrides DomainName=app.mailejoe.com HostedZoneId=$HOSTED_ZONE_ID ExistingCertificate=$ACM_CERT_ARN --no-fail-on-empty-changeset --tags application=mailejoe
