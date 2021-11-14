@@ -1,5 +1,5 @@
-AWSTemplateFormatVersion: 2010-09-09
-Description: "EV cloudfront setup for websites: combining S3, CloudFront and Route53"
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Cloudfront: setup serving frontend resources and with proxy to backend"
 Metadata:
   "AWS::CloudFormation::Interface":
     ParameterGroups:
