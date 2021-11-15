@@ -1,0 +1,129 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "VPC: NAT Gateway"
+Resources:
+  EIP:
+    Type: "AWS::EC2::EIP"
+    Properties:
+      Domain: vpc
+  NatGateway:
+    Type: "AWS::EC2::NatGateway"
+    Properties:
+      AllocationId: !GetAtt "EIP.AllocationId"
+      SubnetId: { "Fn::ImportValue": !Sub "mailejoe-vpc-SubnetPublic" }
+  Route:
+    Type: "AWS::EC2::Route"
+    Properties:
+      RouteTableId: { "Fn::ImportValue": !Sub "mailejoe-vpc-RouteTablePrivate" }
+      DestinationCidrBlock: "0.0.0.0/0"
+      NatGatewayId: !Ref NatGateway
+  AlarmNatGatewayErrorPortAllocation:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      AlarmDescription: !Sub "NAT gateway could not allocate a source port"
+      Namespace: "AWS/NATGateway"
+      MetricName: ErrorPortAllocation
+      Statistic: Sum
+      Period: 60
+      EvaluationPeriods: 1
+      ComparisonOperator: GreaterThanThreshold
+      Threshold: 0
+      AlarmActions:
+        - { "Fn::ImportValue": !Sub "mailejoe-alerts-AlertsTopicARN" }
+      Dimensions:
+        - Name: NatGatewayId
+          Value: !Ref NatGateway
+  AlarmNatGatewayPacketsDropCount:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      AlarmDescription: !Sub "NAT gateway dropped packets"
+      Namespace: "AWS/NATGateway"
+      MetricName: PacketsDropCount
+      Statistic: Sum
+      Period: 60
+      EvaluationPeriods: 1
+      ComparisonOperator: GreaterThanThreshold
+      Threshold: 0
+      AlarmActions:
+        - { "Fn::ImportValue": !Sub "mailejoe-alerts-AlertsTopicARN" }
+      Dimensions:
+        - Name: NatGatewayId
+          Value: !Ref NatGateway
+  AlarmNatGatewayBandwidth:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      AlarmActions:
+        - { "Fn::ImportValue": !Sub "mailejoe-alerts-AlertsTopicARN" }
+      AlarmDescription: !Sub "NAT gateway bandwidth utilization is over 80%"
+      ComparisonOperator: GreaterThanThreshold
+      EvaluationPeriods: 1
+      Metrics:
+        - Id: "in1"
+          Label: "InFromDestination"
+          MetricStat:
+            Metric:
+              Namespace: "AWS/NATGateway"
+              MetricName: BytesInFromDestination # bytes per minute
+              Dimensions:
+                - Name: NatGatewayId
+                  Value: !Ref NatGateway
+            Period: 60
+            Stat: Sum
+            Unit: Bytes
+          ReturnData: false
+        - Id: "in2"
+          Label: "InFromSource"
+          MetricStat:
+            Metric:
+              Namespace: "AWS/NATGateway"
+              MetricName: BytesInFromSource # bytes per minute
+              Dimensions:
+                - Name: NatGatewayId
+                  Value: !Ref NatGateway
+            Period: 60
+            Stat: Sum
+            Unit: Bytes
+          ReturnData: false
+        - Id: "out1"
+          Label: "OutToDestination"
+          MetricStat:
+            Metric:
+              Namespace: "AWS/NATGateway"
+              MetricName: BytesOutToDestination # bytes per minute
+              Dimensions:
+                - Name: NatGatewayId
+                  Value: !Ref NatGateway
+            Period: 60
+            Stat: Sum
+            Unit: Bytes
+          ReturnData: false
+        - Id: "out2"
+          Label: "OutToSource"
+          MetricStat:
+            Metric:
+              Namespace: "AWS/NATGateway"
+              MetricName: BytesOutToSource # bytes per minute
+              Dimensions:
+                - Name: NatGatewayId
+                  Value: !Ref NatGateway
+            Period: 60
+            Stat: Sum
+            Unit: Bytes
+          ReturnData: false
+        - Expression: "(in1+in2+out1+out2)/2/60*8/1000/1000/1000" # to Gbit/s
+          Id: "bandwidth"
+          Label: "Bandwidth"
+          ReturnData: true
+      Threshold: 36 # hard limit is 45 Gbit/s
+      TreatMissingData: notBreaching
+Outputs:
+  TemplateID:
+    Description: "ID of the vpc/vpc-nat-gateway template"
+    Value: "vpc/vpc-nat-gateway"
+  StackName:
+    Description: "Stack name."
+    Value: !Sub "${AWS::StackName}"
+  IPAddress:
+    Description: "The public IP address of the NAT gateway."
+    Value: !Ref EIP
+    Export:
+      Name: !Sub "${AWS::StackName}-IPAddress"
