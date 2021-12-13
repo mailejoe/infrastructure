@@ -151,6 +151,11 @@ Resources:
       RuleAction: allow
       Egress: true
       CidrBlock: "0.0.0.0/0"
+  ClientSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: "Security Group For Mailejoe"
+      VpcId: !Ref VPC
 Outputs:
   TemplateID:
     Description: "ID of the vpc/vpc-1az template"
@@ -193,3 +198,8 @@ Outputs:
     Value: !Ref RouteTablePrivate
     Export:
       Name: !Sub "${AWS::StackName}-RouteTablePrivate"
+  ClientSecurityGroup:
+    Description: "Client Security Group"
+    Value: !Ref ClientSecurityGroup
+    Export:
+      Name: !Sub "${AWS::StackName}-ClientSecurityGroup"
