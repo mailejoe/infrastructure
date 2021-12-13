@@ -19,7 +19,7 @@ Resources:
   AlarmNatGatewayErrorPortAllocation:
     Type: "AWS::CloudWatch::Alarm"
     Properties:
-      AlarmDescription: !Sub "NAT gateway could not allocate a source port"
+      AlarmDescription: "NAT gateway could not allocate a source port"
       Namespace: "AWS/NATGateway"
       MetricName: ErrorPortAllocation
       Statistic: Sum
@@ -35,7 +35,7 @@ Resources:
   AlarmNatGatewayPacketsDropCount:
     Type: "AWS::CloudWatch::Alarm"
     Properties:
-      AlarmDescription: !Sub "NAT gateway dropped packets"
+      AlarmDescription: "NAT gateway dropped packets"
       Namespace: "AWS/NATGateway"
       MetricName: PacketsDropCount
       Statistic: Sum
@@ -53,7 +53,7 @@ Resources:
     Properties:
       AlarmActions:
         - { "Fn::ImportValue": "mailejoe-alerts-AlertsTopicARN" }
-      AlarmDescription: !Sub "NAT gateway bandwidth utilization is over 80%"
+      AlarmDescription: "NAT gateway bandwidth utilization is over 80%"
       ComparisonOperator: GreaterThanThreshold
       EvaluationPeriods: 1
       Metrics:
