@@ -9,11 +9,11 @@ Resources:
     Type: "AWS::EC2::NatGateway"
     Properties:
       AllocationId: !GetAtt "EIP.AllocationId"
-      SubnetId: { "Fn::ImportValue": !Sub "mailejoe-vpc-SubnetPublic" }
+      SubnetId: { "Fn::ImportValue": "mailejoe-vpc-SubnetPublic" }
   Route:
     Type: "AWS::EC2::Route"
     Properties:
-      RouteTableId: { "Fn::ImportValue": !Sub "mailejoe-vpc-RouteTablePrivate" }
+      RouteTableId: { "Fn::ImportValue": "mailejoe-vpc-RouteTablePrivate" }
       DestinationCidrBlock: "0.0.0.0/0"
       NatGatewayId: !Ref NatGateway
   AlarmNatGatewayErrorPortAllocation:
@@ -28,7 +28,7 @@ Resources:
       ComparisonOperator: GreaterThanThreshold
       Threshold: 0
       AlarmActions:
-        - { "Fn::ImportValue": !Sub "mailejoe-alerts-AlertsTopicARN" }
+        - { "Fn::ImportValue": "mailejoe-alerts-AlertsTopicARN" }
       Dimensions:
         - Name: NatGatewayId
           Value: !Ref NatGateway
@@ -44,7 +44,7 @@ Resources:
       ComparisonOperator: GreaterThanThreshold
       Threshold: 0
       AlarmActions:
-        - { "Fn::ImportValue": !Sub "mailejoe-alerts-AlertsTopicARN" }
+        - { "Fn::ImportValue": "mailejoe-alerts-AlertsTopicARN" }
       Dimensions:
         - Name: NatGatewayId
           Value: !Ref NatGateway
@@ -52,7 +52,7 @@ Resources:
     Type: "AWS::CloudWatch::Alarm"
     Properties:
       AlarmActions:
-        - { "Fn::ImportValue": !Sub "mailejoe-alerts-AlertsTopicARN" }
+        - { "Fn::ImportValue": "mailejoe-alerts-AlertsTopicARN" }
       AlarmDescription: !Sub "NAT gateway bandwidth utilization is over 80%"
       ComparisonOperator: GreaterThanThreshold
       EvaluationPeriods: 1
